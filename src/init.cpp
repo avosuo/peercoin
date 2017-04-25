@@ -408,6 +408,7 @@ bool AppInit2(int argc, char* argv[])
 
     if (GetBoolArg("-upgradewallet", fFirstRun))
     {
+
         int nMaxVersion = GetArg("-upgradewallet", 0);
         if (nMaxVersion == 0) // the -walletupgrade without argument case
         {
@@ -420,6 +421,7 @@ bool AppInit2(int argc, char* argv[])
         if (nMaxVersion < pwalletMain->GetVersion())
             strErrors << _("Cannot downgrade wallet") << "\n";
         pwalletMain->SetMaxVersion(nMaxVersion);
+
     }
 
     if (fFirstRun)

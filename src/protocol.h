@@ -15,14 +15,14 @@
 #include <string>
 #include "uint256.h"
 
-#define PPCOIN_PORT  9901
-#define RPC_PORT     9902
-#define TESTNET_PORT 9903
-#define TESTNET_RPC_PORT 9904
+#define PPCOIN_PORT  14014
+#define RPC_PORT     14015
+#define TESTNET_PORT 14016
+#define TESTNET_RPC_PORT 14017
 
 extern bool fTestNet;
 
-void GetMessageStart(unsigned char pchMessageStart[], bool fPersistent = false);
+void GetMessageStart(unsigned char pchMessageStart[]);
 
 static inline unsigned short GetDefaultPort(const bool testnet = fTestNet)
 {
