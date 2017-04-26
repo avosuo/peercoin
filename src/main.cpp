@@ -1922,7 +1922,9 @@ bool CBlock::CheckBlock() const
         return error("CheckBlock() : coinbase output not empty for proof-of-stake block");
 
     // Check coinbase timestamp
-    if (GetBlockTime() > (int64)vtx[0].nTime + nMaxClockDrift)
+    //disabling this for testnet
+    //see Hoshimaru's remarks at https://bitcointalk.org/index.php?topic=1025299.10	
+    if (!fTestNet && GetBlockTime() > (int64)vtx[0].nTime + nMaxClockDrift)
         return DoS(50, error("CheckBlock() : coinbase timestamp is too early"));
 
     // Check coinstake timestamp
@@ -2292,7 +2294,7 @@ bool LoadBlockIndex(bool fAllowNew)
     if (fTestNet)
     {
         hashGenesisBlock = hashGenesisBlockTestNet;
-        bnProofOfWorkLimit = CBigNum(~uint256(0) >> 28);
+        bnProofOfWorkLimit = CBigNum(~uint256(0) >> 16);
         nStakeMinAge = 60 * 60 * 24; // test net min age is 1 day
         nCoinbaseMaturity = 60;
         bnInitialHashTarget = CBigNum(~uint256(0) >> 29);
@@ -2326,7 +2328,7 @@ bool LoadBlockIndex(bool fAllowNew)
         //   vMerkleTree: 4a5e1e
 
         // Genesis block
-        const char* pszTimestamp = "Matonis 07-AUG-2012 Parallel Currencies And The Roadmap To Monetary Freedom";
+        const char* pszTimestamp = "17-04-26Tirrius minoris avosuoiensis";
         CTransaction txNew;
         txNew.nTime = 1345083810;
         txNew.vin.resize(1);
@@ -2338,21 +2340,39 @@ bool LoadBlockIndex(bool fAllowNew)
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1345084287;
+        block.nTime    = 1493226199;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
         block.nNonce   = 2179302059u;
 
         if (fTestNet)
         {
-            block.nTime    = 1345090000;
-            block.nNonce   = 122894938;
+            block.nTime    = 1493226199;
+            block.nNonce   = 68425;
         }
 
+	if (false  && (block.GetHash() != hashGenesisBlock))
+       	{
+           printf("Mining genesis\n");
+           uint256 hashTarget = CBigNum().SetCompact(block.nBits).getuint256();
+           while (block.GetHash() > hashTarget)
+           {
+               ++block.nNonce;
+               if (block.nNonce == 0)
+               {
+                   printf("NONCE WRAPPED, incrementing time");
+                   ++block.nTime;
+               }
+	       if (block.nNonce % 10000 == 0) { 
+		   printf("nonce %08u: hash = %s \n", block.nNonce, block.GetHash().ToString().c_str()); 
+	       }
+           }
+       	}
+
         //// debug print
-        printf("%s\n", block.GetHash().ToString().c_str());
-        printf("%s\n", hashGenesisBlock.ToString().c_str());
-        printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x3c2d8f85fab4d17aac558cc648a1a58acff0de6deb890c29985690052c5993c2"));
+        printf("My beautiful block hash %s\n", block.GetHash().ToString().c_str());
+        printf("hashGenesisBlock (hardcoded) %s\n", hashGenesisBlock.ToString().c_str());
+        printf("block merkle root %s\n", block.hashMerkleRoot.ToString().c_str());
+        assert(block.hashMerkleRoot == uint256("0x172bffb461d76bffadc16d8f78bb2650288b434c3441603302903e29eb2fab42"));
         block.print();
         assert(block.GetHash() == hashGenesisBlock);
         assert(block.CheckBlock());
