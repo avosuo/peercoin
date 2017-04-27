@@ -3747,8 +3747,9 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
     CTransaction txNew;
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
-    txNew.vout.resize(1);
+    txNew.vout.resize(2);   //fencoin, extra coinbase output for metadata
     txNew.vout[0].scriptPubKey << reservekey.GetReservedKey() << OP_CHECKSIG;
+    txNew.vout[1].scriptPubKey << OP_RETURN;
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
