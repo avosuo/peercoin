@@ -2297,7 +2297,7 @@ bool LoadBlockIndex(bool fAllowNew)
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 16);
         nStakeMinAge = 60 * 60 * 24; // test net min age is 1 day
         nCoinbaseMaturity = 60;
-        bnInitialHashTarget = CBigNum(~uint256(0) >> 29);
+        bnInitialHashTarget = CBigNum(~uint256(0) >> 20);
         nModifierInterval = 60 * 20; // test net modifier interval is 20 minutes
     }
 
@@ -3750,6 +3750,7 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
     txNew.vout.resize(2);   //fencoin, extra coinbase output for metadata
     txNew.vout[0].scriptPubKey << reservekey.GetReservedKey() << OP_CHECKSIG;
     txNew.vout[1].scriptPubKey << OP_RETURN;
+    txNew.vout[1].nValue = 0;
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
